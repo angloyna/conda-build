@@ -2767,7 +2767,7 @@ Error:
     patchelf.
 """ % (os.pathsep.join(external.dir_paths)))
 
-
+# this is another function in the conda-build build command
 def build_tree(recipe_list, config, stats, build_only=False, post=False, notest=False,
                need_source_download=True, need_reparse_in_env=False, variants=None):
 
@@ -2804,9 +2804,18 @@ def build_tree(recipe_list, config, stats, build_only=False, post=False, notest=
         else:
             post = None
 
+        # right now, recipe is just a path to a directory. It doesn't have
+        # these references to it having attributes confuses me
         try:
             recipe = recipe_list.popleft()
+            try:
+                recipe.name()
+            except Exception as e:
+                print(e)
+                print('didnt like me trying to get the name of the recipe')
             name = recipe.name() if hasattr(recipe, 'name') else recipe
+            print(name)
+            # start of part of code i didnt read
             if hasattr(recipe, 'config'):
                 metadata = recipe
                 metadata.config.anaconda_upload = config.anaconda_upload
@@ -2828,8 +2837,11 @@ def build_tree(recipe_list, config, stats, build_only=False, post=False, notest=
                                                         permit_unsatisfiable_variants=False)
                 else:
                     metadata_tuples = ((metadata, False, False), )
+            # end of part of code i didnt read
             else:
+                print('this is probably the code block that gets used the way i know how to use it')
                 recipe_parent_dir = os.path.dirname(recipe)
+                print(recipe_parent_dir)
                 recipe = recipe.rstrip("/").rstrip("\\")
                 to_build_recursive.append(os.path.basename(recipe))
 
@@ -2840,6 +2852,9 @@ def build_tree(recipe_list, config, stats, build_only=False, post=False, notest=
                                                 permit_unsatisfiable_variants=False,
                                                 reset_build_id=not config.dirty,
                                                 bypass_env_check=True)
+                print(metadata_tuples)
+                print('that was metadata tuples')
+                # looks like the above is where the meta.yaml is read
             # restrict to building only one variant for bdist_conda.  The way it splits the build
             #    job breaks variants horribly.
             if post in (True, False):

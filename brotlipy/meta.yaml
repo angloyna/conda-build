@@ -1,0 +1,40 @@
+{% set name = "brotlipy" %}
+{% set version = "0.7.0" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+source:
+  url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
+  sha256: 36def0b859beaf21910157b4c33eb3b06d8ce459c942102f16988cca6ea164df
+
+build:
+  number: 0
+  script: "{{ PYTHON }} -m pip install . -vv"
+
+requirements:
+  host:
+    - cffi >=1.0.0
+    - pip
+    - python
+  run:
+    - cffi >=1.0.0
+    - python
+
+test:
+  imports:
+    - brotli
+
+about:
+  home: "https://github.com/python-hyper/brotlipy/"
+  license: MIT
+  license_family: MIT
+  license_file: 
+  summary: "Python binding to the Brotli library"
+  doc_url: 
+  dev_url: 
+
+extra:
+  recipe-maintainers:
+    - your-github-id-here

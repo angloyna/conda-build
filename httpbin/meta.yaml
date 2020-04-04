@@ -1,0 +1,54 @@
+{% set name = "httpbin" %}
+{% set version = "0.7.0" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+source:
+  url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
+  sha256: cbb37790c91575f4f15757f42ad41d9f729eb227d5edbe89e4ec175486db8dfa
+
+build:
+  number: 0
+  script: "{{ PYTHON }} -m pip install . -vv"
+
+requirements:
+  host:
+    - brotlipy
+    - decorator
+    - flask
+    - itsdangerous
+    - markupsafe
+    - pip
+    - python
+    - raven[flask]
+    - six
+    - werkzeug >=0.14.1
+  run:
+    - brotlipy
+    - decorator
+    - flask
+    - itsdangerous
+    - markupsafe
+    - python
+    - raven[flask]
+    - six
+    - werkzeug >=0.14.1
+
+test:
+  imports:
+    - httpbin
+
+about:
+  home: "https://github.com/requests/httpbin"
+  license: MIT
+  license_family: MIT
+  license_file: 
+  summary: "HTTP Request and Response Service"
+  doc_url: 
+  dev_url: 
+
+extra:
+  recipe-maintainers:
+    - your-github-id-here

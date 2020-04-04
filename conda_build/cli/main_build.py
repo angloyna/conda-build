@@ -400,7 +400,14 @@ def check_action(recipe, config):
 
 
 def execute(args):
+    print(args)
+    print('args before parse')
     _parser, args = parse_args(args)
+    print(args.recipe)
+    print(f'{args.__dict__}')
+    print('is this some underlying thing')
+    print('is this doing anything')
+    print(args)
     config = Config(**args.__dict__)
     build.check_external()
 
@@ -410,6 +417,9 @@ def execute(args):
     config.override_channels = args.override_channels
     config.verbose = not args.quiet or args.debug
 
+    # so weird. you can put in a recipe path and purge.
+    # it will do the clean and then not build the package.
+    # seems like you'd expect it to purge and then build.
     if 'purge' in args.recipe:
         build.clean_build(config)
         return
@@ -460,6 +470,9 @@ def execute(args):
     elif action:
         outputs = [action(recipe, config) for recipe in args.recipe]
     else:
+        print(args.variants)
+        print('whats variants')
+        # i dont see how to set the variants or what that means
         outputs = api.build(args.recipe, post=args.post, test_run_post=args.test_run_post,
                             build_only=args.build_only, notest=args.notest, already_built=None, config=config,
                             verify=args.verify, variants=args.variants)

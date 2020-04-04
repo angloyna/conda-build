@@ -1,0 +1,48 @@
+{% set name = "pytest-httpbin" %}
+{% set version = "0.0.7" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+source:
+  url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
+  sha256: 03af8a7055c8bbcb68b14d9a14c103c82c97aeb86a8f1b29cd63d83644c2f021
+
+build:
+  number: 0
+  script: "{{ PYTHON }} -m pip install . -vv"
+
+requirements:
+  host:
+    - decorator
+    - flask
+    - httpbin
+    - pip
+    - python
+    - setuptools
+    - six
+  run:
+    - decorator
+    - flask
+    - httpbin
+    - python
+    - setuptools
+    - six
+
+test:
+  imports:
+    - pytest_httpbin
+
+about:
+  home: "https://github.com/kevin1024/pytest-httpbin"
+  license: MIT
+  license_family: MIT
+  license_file: 
+  summary: "Easily test your HTTP library against a local copy of httpbin"
+  doc_url: 
+  dev_url: 
+
+extra:
+  recipe-maintainers:
+    - your-github-id-here

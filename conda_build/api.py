@@ -151,6 +151,7 @@ def check(recipe_path, no_download_source=False, config=None, variants=None, **k
     return all(m[0].check_fields() for m in metadata)
 
 
+# actual meat and potatoes of the build logic is here.
 def build(recipe_paths_or_metadata, post=None, need_source_download=True,
           build_only=False, notest=False, config=None, variants=None, stats=None,
           **kwargs):
@@ -168,6 +169,8 @@ def build(recipe_paths_or_metadata, post=None, need_source_download=True,
                                          "other arguments (config) by keyword.")
 
     config = get_or_merge_config(config, **kwargs)
+    print(config)
+    print('that was config')
 
     # if people don't pass in an object to capture stats in, they won't get them returned.
     #     We'll still track them, though.
@@ -175,26 +178,49 @@ def build(recipe_paths_or_metadata, post=None, need_source_download=True,
         stats = {}
 
     recipe_paths_or_metadata = _ensure_list(recipe_paths_or_metadata)
+    print('recipe_paths_or_metadata')
+    print(recipe_paths_or_metadata)
     for recipe in recipe_paths_or_metadata:
+        print(hasattr(recipe, "config"))
+        try:
+            print(recipe.config)
+        except Exception as e:
+            print(e)
+            print('it didnt like me asking for config')
         if not any((hasattr(recipe, "config"), isinstance(recipe, string_types))):
             raise ValueError("Recipe passed was unrecognized object: {}".format(recipe))
     string_paths = [p for p in recipe_paths_or_metadata if isinstance(p, string_types)]
+    print(string_paths)
+    print('string_paths')
     paths = _expand_globs(string_paths, os.getcwd())
+    print(paths)
+    print('paths')
     recipes = []
     for recipe in paths:
+        # presumably you can pass in the meta.yaml path instead of the
+        # directory too
         if (os.path.isdir(recipe) or
                 (os.path.isfile(recipe) and
                  os.path.basename(recipe) in ('meta.yaml', 'conda.yaml'))):
             try:
+                print(find_recipe(recipe))
+                print('result of find recipe')
                 recipes.append(find_recipe(recipe))
             except IOError:
                 continue
+    # not entirely sure what this does yet
+    # for running conda build ./requests the following line extends the array
+    # no additional items
+    # so curious what this situation is.
     metadata = [m for m in recipe_paths_or_metadata if hasattr(m, 'config')]
+    print(metadata)
+    print('metadata')
 
     recipes.extend(metadata)
     absolute_recipes = []
     for recipe in recipes:
         if hasattr(recipe, "config"):
+            print('it probably didnt go in here')
             absolute_recipes.append(recipe)
         else:
             if not os.path.isabs(recipe):
@@ -205,6 +231,13 @@ def build(recipe_paths_or_metadata, post=None, need_source_download=True,
 
     if not absolute_recipes:
         raise ValueError('No valid recipes found for input: {}'.format(recipe_paths_or_metadata))
+
+    # okay so far we've:
+    # 1. done something with get or merge config, didn't look at it
+    # 2. validated that each recipe has a config and is the right type
+    # 3. did something with the metadata for some reason. didnt look at it
+    # 4. normalized the path to the absolute based on user input
+
     return build_tree(absolute_recipes, config, stats, build_only=build_only, post=post,
                       notest=notest, need_source_download=need_source_download, variants=variants)
 

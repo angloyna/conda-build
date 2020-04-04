@@ -759,6 +759,8 @@ def expand_outputs(metadata_tuples):
     return list(expanded_outputs.values())
 
 
+# this is the function reads the meta.yaml from the path
+# whats a variant
 def render_recipe(recipe_path, config, no_download_source=False, variants=None,
                   permit_unsatisfiable_variants=True, reset_build_id=True, bypass_env_check=False):
     """Returns a list of tuples, each consisting of
@@ -772,6 +774,8 @@ def render_recipe(recipe_path, config, no_download_source=False, variants=None,
     # Don't use byte literals for paths in Python 2
     if not PY3:
         arg = arg.decode(getpreferredencoding() or 'utf-8')
+    # huh. i wonder what is using this to pass in a tar file.
+    # the way i've been using it passes in a recipe directory
     if isfile(arg):
         if arg.endswith(('.tar', '.tar.gz', '.tgz', '.tar.bz2')):
             recipe_dir = tempfile.mkdtemp()
@@ -792,6 +796,8 @@ def render_recipe(recipe_path, config, no_download_source=False, variants=None,
     if not isdir(recipe_dir):
         sys.exit("Error: no such directory: %s" % recipe_dir)
 
+    # MetaData is the class that parses the file and
+    # makes the metadata with the config
     try:
         m = MetaData(recipe_dir, config=config)
     except exceptions.YamlParsingError as e:
