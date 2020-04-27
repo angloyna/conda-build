@@ -3139,26 +3139,38 @@ def clean_build(config, folders=None):
 
 
 def is_package_built(metadata, env, include_local=True):
+    print(f'these are metadata config bldpkgs dirs: {metadata.config.bldpkgs_dirs}')
     for d in metadata.config.bldpkgs_dirs:
+        print(f'in package build logic {d}')
         if not os.path.isdir(d):
+            print('didnt think that was a dir making {d}')
             os.makedirs(d)
         update_index(d, verbose=metadata.config.debug, warn=False, threads=1)
     subdir = getattr(metadata.config, '{}_subdir'.format(env))
+    print(f'subdir: {subdir}')
 
     urls = [url_path(metadata.config.output_folder), 'local'] if include_local else []
+    print(f'urls: {urls}')
+    print(f'rc urls {get_rc_urls()}')
     urls += get_rc_urls()
+    print(f'metadata.config.channel_urls: {metadata.config.channel_urls}')
     if metadata.config.channel_urls:
         urls.extend(metadata.config.channel_urls)
 
     spec = MatchSpec(name=metadata.name(), version=metadata.version(), build=metadata.build_id())
+    print(f'spec: {spec}')
 
     if conda_45:
+        print(f'it thinks its conda_45')
         from conda.api import SubdirData
+        print(f'results of the thing: {bool(SubdirData.query_all(spec, channels=urls, subdirs=(subdir, "noarch")))}')
         return bool(SubdirData.query_all(spec, channels=urls, subdirs=(subdir, "noarch")))
     else:
+        print('it does not think its conda 45')
         index, _, _ = get_build_index(subdir=subdir, bldpkgs_dir=metadata.config.bldpkgs_dir,
                                       output_folder=metadata.config.output_folder, channel_urls=urls,
                                       debug=metadata.config.debug, verbose=metadata.config.verbose,
                                       locking=metadata.config.locking, timeout=metadata.config.timeout,
                                       clear_cache=True)
+        print(f'index.values: {index.values()}')
         return any(spec.match(prec) for prec in index.values())
